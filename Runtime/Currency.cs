@@ -16,15 +16,23 @@ namespace Fsi.Currencies
         public TEnum type;
         public int amount;
 
+        public Currency()
+        {
+            type = default;
+            amount = 0;
+        }
+        
+        public Currency(TEnum type, int amount)
+        {
+            this.type = type;
+            this.amount = amount;
+        }
+
         public bool TryCombine(Currency<TEnum> other, out Currency<TEnum> combined)
         {
             if (type.Equals(other.type))
             {
-                combined = new Currency<TEnum>
-                           {
-                               type = type,
-                               amount = other.amount,
-                           };
+                combined = new Currency<TEnum>(type, other.amount);
                 return true;
             }
 
@@ -60,14 +68,14 @@ namespace Fsi.Currencies
         
         public void OnBeforeSerialize()
         {
-            name = $"{type} - {amount}";
+            name = ToString();
         }
 
         public void OnAfterDeserialize() { }
 
         public override string ToString()
         {
-            return name;
+            return $"{type}: {amount}";
         }
     }
 }
