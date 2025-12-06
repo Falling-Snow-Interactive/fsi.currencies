@@ -12,5 +12,8 @@
     "name": "Kira Dinan",
     "email": "kiradinan.dev@gmail.com"
   },
-  "hideInEditor": false
+  "hideInEditor": false,
+  "dependencies": {
+    "com.fallingsnowinteractive.datasystem": "0.0.2"
+  }
 }

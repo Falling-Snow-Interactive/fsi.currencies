@@ -5,9 +5,10 @@ using UnityEngine;
 namespace Fsi.Currencies
 {
 	[Serializable]
-	public abstract class Wallet<TEnum, TCurrency>
-		where TEnum : Enum
-		where TCurrency : Currency<TEnum>, new()
+	public abstract class Wallet<TID, TData, TCurrency>
+		where TID : Enum
+		where TData : CurrencyData<TID>
+		where TCurrency : CurrencyInstance<TID, TData>, new()
 	{
 		[SerializeField]
 		private List<TCurrency> currencies;
@@ -17,25 +18,25 @@ namespace Fsi.Currencies
 			currencies = new List<TCurrency>();
 		}
 
-		public Wallet(TCurrency defaultCurrency)
+		protected Wallet(TCurrency defaultCurrency)
 		{
 			currencies = new List<TCurrency>();
 			Add(defaultCurrency);
 		}
 
-		public Wallet(TEnum type, int amount)
+		protected Wallet(TData type, int amount)
 		{
 			currencies = new List<TCurrency>();
 			Add(type, amount);
 		}
 
-		public Wallet(List<TCurrency> currencies)
+		protected Wallet(List<TCurrency> currencies)
 		{
 			this.currencies = new List<TCurrency>();
 			foreach (TCurrency currency in currencies) Add(currency);
 		}
 
-		public Wallet(Wallet<TEnum, TCurrency> wallet)
+		protected Wallet(Wallet<TID, TData, TCurrency> wallet)
 		{
 			currencies = new List<TCurrency>();
 			foreach (TCurrency currency in wallet.Currencies) Add(currency);
@@ -44,10 +45,25 @@ namespace Fsi.Currencies
 		public List<TCurrency> Currencies => currencies;
 		public event Action Changed;
 
-		public bool TryGetCurrency(TEnum type, out TCurrency currency)
+		public bool TryGetCurrency(TID id, out TCurrency currency)
 		{
 			foreach (TCurrency c in currencies)
-				if (c.type.Equals(type))
+			{
+				if (c.Data.ID.Equals(id))
+				{
+					currency = c;
+					return true;
+				}
+			}
+
+			currency = null;
+			return false;
+		}
+		
+		public bool TryGetCurrency(TData type, out TCurrency currency)
+		{
+			foreach (TCurrency c in currencies)
+				if (c.Data.Equals(type))
 				{
 					currency = c;
 					return true;
@@ -57,9 +73,9 @@ namespace Fsi.Currencies
 			return false;
 		}
 
-		public void Add(TEnum type, int amount)
+		public void Add(TData data, int amount)
 		{
-			if (TryGetCurrency(type, out TCurrency c))
+			if (TryGetCurrency(data, out TCurrency c))
 			{
 				c.Add(amount);
 			}
@@ -67,8 +83,8 @@ namespace Fsi.Currencies
 			{
 				TCurrency currency = new()
 				                     {
-					                     amount = amount,
-					                     type = type
+					                     Data = data,
+					                     Amount = amount,
 				                     };
 				currencies.Add(currency);
 			}
@@ -78,29 +94,29 @@ namespace Fsi.Currencies
 
 		public void Add(TCurrency currency)
 		{
-			Add(currency.type, currency.amount);
+			Add(currency.Data, currency.Amount);
 			Changed?.Invoke();
 		}
 
-		public void Add(Wallet<TEnum, TCurrency> wallet)
+		public void Add(Wallet<TID, TData, TCurrency> wallet)
 		{
 			foreach (TCurrency currency in wallet.Currencies) Add(currency);
 		}
 
 		public bool CanAfford(TCurrency currency)
 		{
-			if (TryGetCurrency(currency.type, out TCurrency c)) return c.amount >= currency.amount;
+			if (TryGetCurrency(currency.Data, out TCurrency c)) return c.Amount >= currency.Amount;
 
 			return false;
 		}
 
 		public bool Remove(TCurrency currency)
 		{
-			if (TryGetCurrency(currency.type, out TCurrency c))
+			if (TryGetCurrency(currency.Data, out TCurrency c))
 			{
-				if (c.amount < currency.amount) return false;
+				if (c.Amount < currency.Amount) return false;
 
-				c.Remove(currency.amount);
+				c.Remove(currency.Amount);
 				Changed?.Invoke();
 
 				return true;
