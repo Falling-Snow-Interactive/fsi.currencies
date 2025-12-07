@@ -13,6 +13,7 @@ namespace Fsi.Currencies
 		[SerializeField]
 		private string name;
 
+		[CurrencyLibrary]
 		[SerializeField]
 		private TData data;
 		public TData Data
