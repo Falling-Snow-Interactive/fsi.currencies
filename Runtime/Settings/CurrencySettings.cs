@@ -17,7 +17,7 @@ namespace Fsi.Currencies.Settings
 		private static CurrencySettings<TID, TData> Settings => settings ??= GetOrCreateSettings();
 		
 		// Libraries
-		[FsiHeader("Libraries")]
+		[Header("Libraries")]
 
 		[SerializeField]
 		private CurrencyLibrary<TID, TData> library = new();

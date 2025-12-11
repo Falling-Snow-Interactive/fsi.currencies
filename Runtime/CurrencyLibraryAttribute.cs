@@ -1,10 +1,10 @@
 using System;
-using Fsi.DataSystem.Selectors;
+using Fsi.DataSystem.Libraries;
 
 namespace Fsi.Currencies
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class CurrencyLibraryAttribute : SelectorAttribute
+    public class CurrencyLibraryAttribute : LibraryAttribute
     {
         
     }
