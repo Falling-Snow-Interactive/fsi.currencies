@@ -1,3 +1,4 @@
+using Fsi.Ui;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -9,20 +10,33 @@ namespace Fsi.Currencies
     {
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            VisualElement root = new() { style = { flexDirection = FlexDirection.Row } };
+            VisualElement root = new();
+            FsiUiEditorUtility.AddUss(root);
+            
+            root.AddToClassList("fsi-property-row");
 
-            SerializedProperty dataProp = property.FindPropertyRelative("data");
+            Label label = new(property.displayName);
+            label.AddToClassList("fsi-property-label");
+
+            root.Add(label);
+
+            VisualElement data = new();
+            data.AddToClassList("fsi-property-field");
+
+            root.Add(data);
+            
+            SerializedProperty currencyProp = property.FindPropertyRelative("currency");
             SerializedProperty amountProp = property.FindPropertyRelative("amount");
-
-            PropertyField dataField = new(dataProp)
+            
+            PropertyField currencyField = new(currencyProp)
                                       {
-                                          label = property.displayName, name = property.displayName,
                                           style = { flexGrow = 1 }
                                       };
             PropertyField amountField = new(amountProp) { label = "" };
-
-            root.Add(dataField);
-            root.Add(amountField);
+            
+            data.Add(amountField);
+            data.Add(currencyField);
+            // data.Add(amountField);
             
             return root;
         }

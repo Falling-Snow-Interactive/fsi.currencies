@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Fsi.Currencies
 {
 	[Serializable]
-	public class CurrencyInstance<TID, TData> : ISerializationCallbackReceiver
-		where TData : CurrencyData<TID>
+	public class CurrencyInstance<TID, TCurrency> : ISerializationCallbackReceiver
+		where TCurrency : CurrencyData<TID>
 	{
 		public event Action Changed;
 		
@@ -15,13 +15,14 @@ namespace Fsi.Currencies
 
 		[CurrencyLibrary]
 		[SerializeField]
-		private TData data;
-		public TData Data
+		private TCurrency currency;
+		public TCurrency Currency
 		{
-			get => data;
-			set => data = value;
+			get => currency;
+			set => currency = value;
 		}
 		
+		[Min(1)]
 		[SerializeField]
 		private int amount;
 		public int Amount
@@ -32,27 +33,33 @@ namespace Fsi.Currencies
 
 		public CurrencyInstance()
 		{
-			data = default;
-			amount = 0;
+			currency = default;
+			amount = 1;
 		}
 
-		public CurrencyInstance(TData data, int amount)
+		public CurrencyInstance(TCurrency currency, int amount)
 		{
-			this.data = data;
+			this.currency = currency;
 			this.amount = amount;
 		}
 		
-		public bool TryCombine(CurrencyInstance<TID, TData> other, out CurrencyInstance<TID, TData> combined)
+		#region Arithmetic
+		
+		#region Combine
+		
+		public bool TryCombine(CurrencyInstance<TID, TCurrency> other, out CurrencyInstance<TID, TCurrency> combined)
 		{
-			if (data.Equals(other.data))
+			if (currency.Equals(other.currency))
 			{
-				combined = new CurrencyInstance<TID, TData>(data, other.amount);
+				combined = new CurrencyInstance<TID, TCurrency>(currency, other.amount);
 				return true;
 			}
 
 			combined = null;
 			return false;
 		}
+		
+		#endregion
 		
 		#region Add
 
@@ -62,16 +69,16 @@ namespace Fsi.Currencies
 			Changed?.Invoke();
 		}
 
-		public void Add(CurrencyInstance<TID, TData> currencyInstance)
+		public void Add(CurrencyInstance<TID, TCurrency> currencyInstance)
 		{
-			if (data.Equals(currencyInstance.data))
+			if (currency.Equals(currencyInstance.currency))
 			{
 				amount += currencyInstance.amount;
 				Changed?.Invoke();
 			}
 			else
 			{
-				Debug.LogError($"Cannot combine currency - {data} with currency - {currencyInstance.data}.");
+				Debug.LogError($"Cannot combine currency - {currency} with currency - {currencyInstance.currency}.");
 			}
 		}
 		
@@ -85,6 +92,8 @@ namespace Fsi.Currencies
 			this.amount = Mathf.Clamp(this.amount, 0, int.MaxValue);
 			Changed?.Invoke();
 		}
+		
+		#endregion
 		
 		#endregion
 		
@@ -105,7 +114,7 @@ namespace Fsi.Currencies
 
 		public override string ToString()
 		{
-			return $"{data} - {amount}";
+			return $"{currency} - {amount}";
 		}
 		
 		#endregion

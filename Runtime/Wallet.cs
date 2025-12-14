@@ -49,7 +49,7 @@ namespace Fsi.Currencies
 		{
 			foreach (TCurrency c in currencies)
 			{
-				if (c.Data.ID.Equals(id))
+				if (c.Currency.ID.Equals(id))
 				{
 					currency = c;
 					return true;
@@ -63,7 +63,7 @@ namespace Fsi.Currencies
 		public bool TryGetCurrency(TData type, out TCurrency currency)
 		{
 			foreach (TCurrency c in currencies)
-				if (c.Data.Equals(type))
+				if (c.Currency.Equals(type))
 				{
 					currency = c;
 					return true;
@@ -83,7 +83,7 @@ namespace Fsi.Currencies
 			{
 				TCurrency currency = new()
 				                     {
-					                     Data = data,
+					                     Currency = data,
 					                     Amount = amount,
 				                     };
 				currencies.Add(currency);
@@ -94,7 +94,7 @@ namespace Fsi.Currencies
 
 		public void Add(TCurrency currency)
 		{
-			Add(currency.Data, currency.Amount);
+			Add(currency.Currency, currency.Amount);
 			Changed?.Invoke();
 		}
 
@@ -105,14 +105,14 @@ namespace Fsi.Currencies
 
 		public bool CanAfford(TCurrency currency)
 		{
-			if (TryGetCurrency(currency.Data, out TCurrency c)) return c.Amount >= currency.Amount;
+			if (TryGetCurrency(currency.Currency, out TCurrency c)) return c.Amount >= currency.Amount;
 
 			return false;
 		}
 
 		public bool Remove(TCurrency currency)
 		{
-			if (TryGetCurrency(currency.Data, out TCurrency c))
+			if (TryGetCurrency(currency.Currency, out TCurrency c))
 			{
 				if (c.Amount < currency.Amount) return false;
 
