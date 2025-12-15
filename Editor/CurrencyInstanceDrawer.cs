@@ -11,32 +11,30 @@ namespace Fsi.Currencies
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             VisualElement root = new();
-            FsiUiEditorUtility.AddUss(root);
-            
             root.AddToClassList("fsi-property-row");
-
-            Label label = new(property.displayName);
-            label.AddToClassList("fsi-property-label");
-
-            root.Add(label);
+            FsiUiEditorUtility.AddUss(root);
 
             VisualElement data = new();
-            data.AddToClassList("fsi-property-field");
+            data.AddToClassList("fsi-property-row");
 
             root.Add(data);
             
             SerializedProperty currencyProp = property.FindPropertyRelative("currency");
             SerializedProperty amountProp = property.FindPropertyRelative("amount");
+
+            PropertyField currencyField = new(currencyProp);
+            currencyField.AddToClassList("fsi-property-field");
             
-            PropertyField currencyField = new(currencyProp)
-                                      {
-                                          style = { flexGrow = 1 }
-                                      };
-            PropertyField amountField = new(amountProp) { label = "" };
+            IntegerField amountField = new() { label = property.displayName };
+            amountField.BindProperty(amountProp);
+            amountField.AddToClassList("fsi-property-field");
+            amountField.RegisterValueChangedCallback(_ =>
+                                                     {
+                                                         amountField.label = property.displayName;
+                                                     });
             
             data.Add(amountField);
             data.Add(currencyField);
-            // data.Add(amountField);
             
             return root;
         }
