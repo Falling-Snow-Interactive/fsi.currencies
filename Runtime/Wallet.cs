@@ -63,11 +63,13 @@ namespace Fsi.Currencies
 		public bool TryGetCurrency(TData type, out TCurrency currency)
 		{
 			foreach (TCurrency c in currencies)
+			{
 				if (c.Currency.Equals(type))
 				{
 					currency = c;
 					return true;
 				}
+			}
 
 			currency = null;
 			return false;
@@ -100,7 +102,10 @@ namespace Fsi.Currencies
 
 		public void Add(Wallet<TID, TData, TCurrency> wallet)
 		{
-			foreach (TCurrency currency in wallet.Currencies) Add(currency);
+			foreach (TCurrency currency in wallet.Currencies)
+			{
+				Add(currency);
+			}
 		}
 
 		public bool CanAfford(TCurrency currency)
